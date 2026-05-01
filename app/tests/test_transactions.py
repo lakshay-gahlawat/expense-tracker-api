@@ -1,6 +1,6 @@
-from datetime import datetime
-
-TIMESTAMP = datetime.utcnow().isoformat()
+# NEW
+from datetime import datetime, timezone
+TIMESTAMP = datetime.now(timezone.utc).isoformat()
 
 
 def make_transaction(account_id, amount=500, t_type="expense", category="Food"):

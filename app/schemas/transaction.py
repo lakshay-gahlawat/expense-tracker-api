@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, Literal
 from datetime import datetime
 from decimal import Decimal
@@ -22,6 +22,8 @@ class TransactionUpdate(BaseModel):
 
 
 class TransactionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     account_id: str
     amount: Decimal
@@ -30,16 +32,12 @@ class TransactionResponse(BaseModel):
     description: Optional[str] = None
     date: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class TransactionPaginatedResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     items: list[TransactionResponse]
     total: int
     page: int
     limit: int
     pages: int
-
-    class Config:
-        from_attributes = True

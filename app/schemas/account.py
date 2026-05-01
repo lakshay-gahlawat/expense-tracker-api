@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -12,21 +12,19 @@ class AccountUpdate(BaseModel):
 
 
 class AccountResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     name: str
     user_id: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class AccountPaginatedResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     items: list[AccountResponse]
     total: int
     page: int
     limit: int
     pages: int
-
-    class Config:
-        from_attributes = True
