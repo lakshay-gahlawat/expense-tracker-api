@@ -1,23 +1,34 @@
 import pytest
 
-
 class TestRegister:
     def test_register_success(self, client):
-        res = client.post("/users/register", json={"email": "new@example.com", "password": "pass123"})
+        res = client.post("/users/register", json={"email": "new@example.com", "password": "pass1234"})
         assert res.status_code == 201
         data = res.json()
         assert data["email"] == "new@example.com"
-        assert "hashed_password" not in data  # must never be exposed
+        assert "hashed_password" not in data
         assert "id" in data
 
     def test_register_duplicate_email(self, client):
-        payload = {"email": "dup@example.com", "password": "pass123"}
+        payload = {"email": "dup@example.com", "password": "pass1234"}
         client.post("/users/register", json=payload)
         res = client.post("/users/register", json=payload)
         assert res.status_code == 409
 
     def test_register_missing_fields(self, client):
         res = client.post("/users/register", json={"email": "x@x.com"})
+        assert res.status_code == 422
+
+    def test_register_weak_password_too_short(self, client):
+        res = client.post("/users/register", json={"email": "weak@example.com", "password": "abc"})
+        assert res.status_code == 422
+
+    def test_register_weak_password_no_number(self, client):
+        res = client.post("/users/register", json={"email": "weak@example.com", "password": "abcdefgh"})
+        assert res.status_code == 422
+
+    def test_register_weak_password_no_letter(self, client):
+        res = client.post("/users/register", json={"email": "weak@example.com", "password": "12345678"})
         assert res.status_code == 422
 
 
@@ -60,6 +71,6 @@ class TestUpdateUser:
         assert res.json()["email"] == "updated@example.com"
 
     def test_cannot_update_other_user(self, client, auth_headers):
-        other = client.post("/users/register", json={"email": "other@x.com", "password": "pass123"}).json()
+        other = client.post("/users/register", json={"email": "other@x.com", "password": "pass1234"}).json()
         res = client.patch(f"/users/{other['id']}", json={"email": "hack@x.com"}, headers=auth_headers)
         assert res.status_code == 403

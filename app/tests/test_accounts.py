@@ -32,13 +32,11 @@ class TestGetAccounts:
         assert len(res.json()["items"]) == 2
 
     def test_cannot_see_other_users_accounts(self, client, auth_headers, account):
-        # Register a second user
-        client.post("/users/register", json={"email": "user2@x.com", "password": "pass123"})
-        login = client.post("/users/login", json={"email": "user2@x.com", "password": "pass123"})
+        client.post("/users/register", json={"email": "user2@x.com", "password": "pass1234"})
+        login = client.post("/users/login", json={"email": "user2@x.com", "password": "pass1234"})
         headers2 = {"Authorization": f"Bearer {login.json()['access_token']}"}
         res = client.get("/accounts/", headers=headers2)
         assert res.json()["total"] == 0
-
 
 class TestAccountSummary:
     def test_summary_empty(self, client, auth_headers, account):
